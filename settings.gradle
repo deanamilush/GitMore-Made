@@ -8,3 +8,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "GitMore"
 include ':app'
+include ':core'
+include ':favorite'

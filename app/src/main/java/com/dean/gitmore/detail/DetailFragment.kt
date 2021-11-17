@@ -5,56 +5,125 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.fragment.navArgs
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.dean.core.data.Resource
+import com.dean.core.domain.User
 import com.dean.gitmore.R
+import com.dean.gitmore.databinding.FragmentDetailBinding
+import com.dean.gitmore.ui.follow.FollowFragment
+import com.google.android.material.tabs.TabLayoutMediator
+import org.koin.android.viewmodel.ext.android.viewModel
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [DetailFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class DetailFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var detailBinding: FragmentDetailBinding
+    private lateinit var pagerAdapter: PagerAdapter
+    private lateinit var user: User
+    private var isFavorite = false
+    private val args: DetailFragmentArgs by navArgs()
+    private val detailViewModel: DetailViewModel by viewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_detail, container, false)
+    ): View {
+        val actionBar = (activity as AppCompatActivity).supportActionBar
+        actionBar?.title = args.Username
+        detailBinding = FragmentDetailBinding.inflate(layoutInflater, container, false)
+        detailBinding.lifecycleOwner = viewLifecycleOwner
+        observeDetail()
+        return detailBinding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment DetailFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            DetailFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        /* changedFavorite(isFavorite)
+         detailBinding.fabFavorite.setOnClickListener {
+             addOrRemoveFavorite()
+             changedFavorite(isFavorite)
+         }*/
+        val tabList = arrayOf(resources.getString(R.string.followers), resources.getString(R.string.following))
+        pagerAdapter = PagerAdapter(tabList, args.Username, this)
+        detailBinding.pager.adapter = pagerAdapter
+
+        TabLayoutMediator(detailBinding.tabs, detailBinding.pager) {tab, position ->
+            tab.text = tabList[position]
+        }.attach()
+    }
+
+    private fun observeDetail() {
+
+        detailViewModel.detailUsers(args.Username).observe(viewLifecycleOwner, {
+            when(it) {
+                is Resource.Success -> {
+                    user = it.data!!
+                    detailBinding.data = it.data
+                    detailViewModel.getDetailState(args.Username)?.observe(viewLifecycleOwner, { user ->
+                        isFavorite = user.isFavorite == true
+                        changedFavorite(isFavorite)
+                    })
+                    detailBinding.fabFavorite.show()
+                }
+
+                is Resource.Error -> {
+                    detailBinding.fabFavorite.hide()
+                }
+
+                is Resource.Loading -> {
+                    detailBinding.fabFavorite.hide()
                 }
             }
+            changedFavorite(isFavorite)
+            detailBinding.fabFavorite.setOnClickListener {
+                addOrRemoveFavorite()
+                changedFavorite(isFavorite)
+            }
+        })
+        /* detailViewModel.isFavorite.observe(viewLifecycleOwner, {
+             isFavorite = it
+             changedFavorite(it)
+         })*/
+    }
+
+    private fun addOrRemoveFavorite() {
+        if (!isFavorite) {
+            user.isFavorite = !isFavorite
+            detailViewModel.insertFavorite(user)
+            FancyToast.makeText(
+                context, resources.getString(R.string.favorite_add, user.login), Toast.LENGTH_SHORT, FancyToast.SUCCESS, false
+            ).show()
+            isFavorite = !isFavorite
+        } else {
+            user.isFavorite = !isFavorite
+            detailViewModel.deleteFavorite(user)
+            FancyToast.makeText(
+                context, resources.getString(R.string.favorite_remove, user.login), Toast.LENGTH_SHORT, FancyToast.ERROR, false
+            ).show()
+            isFavorite = !isFavorite
+        }
+    }
+
+    private fun changedFavorite(statusFavorite: Boolean) {
+        if (statusFavorite){
+            detailBinding.fabFavorite.setImageResource(R.drawable.ic_favorite)
+        }
+        else {
+            detailBinding.fabFavorite.setImageResource(R.drawable.ic_unfavorite)
+        }
+    }
+
+    inner class PagerAdapter(
+        private val tabList: Array<String>,
+        private val username: String,
+        fragment: Fragment
+    ) : FragmentStateAdapter(fragment) {
+
+        override fun getItemCount(): Int = tabList.size
+
+        override fun createFragment(position: Int): Fragment =
+            FollowFragment.newInstance(username, tabList[position])
     }
 }

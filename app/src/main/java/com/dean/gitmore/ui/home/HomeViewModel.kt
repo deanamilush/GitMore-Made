@@ -1,13 +1,22 @@
 package com.dean.gitmore.ui.home
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
+import com.bumptech.glide.load.engine.Resource
+import com.dean.core.domain.User
+import com.dean.core.domain.UserUseCase
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(userUseCase: UserUseCase) : ViewModel() {
+    private var username: MutableLiveData<String> = MutableLiveData()
 
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is home Fragment"
+    fun setSearch(query: String) {
+        if (username.value == query) {
+            return
+        }
+        username.value = query
     }
-    val text: LiveData<String> = _text
+
+    val users: LiveData<Resource<List<User>>> = Transformations
+        .switchMap(username) {
+            userUseCase.getAllUsers(it).asLiveData()
+        }
 }
