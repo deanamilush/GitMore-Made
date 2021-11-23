@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dean.core.databinding.ItemUserListBinding
-import com.dean.core.domain.User
 
 class UserAdapter(private val user: ArrayList<User>, private val clickListener: (String, View) -> Unit):
     RecyclerView.Adapter<UserAdapter.UserViewHolder>() {

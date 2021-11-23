@@ -2,7 +2,6 @@ package com.dean.gitmore.ui.home
 
 import androidx.lifecycle.*
 import com.bumptech.glide.load.engine.Resource
-import com.dean.core.domain.User
 import com.dean.core.domain.UserUseCase
 
 class HomeViewModel(userUseCase: UserUseCase) : ViewModel() {

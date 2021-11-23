@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.dean.core.data.Resource
-import com.dean.core.domain.User
+import com.dean.core.domain.model.User
 import com.dean.gitmore.R
 import com.dean.gitmore.databinding.FragmentDetailBinding
 import com.dean.gitmore.ui.follow.FollowFragment
@@ -31,7 +31,7 @@ class DetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val actionBar = (activity as AppCompatActivity).supportActionBar
-        actionBar?.title = args.Username
+        actionBar?.title = args.username
         detailBinding = FragmentDetailBinding.inflate(layoutInflater, container, false)
         detailBinding.lifecycleOwner = viewLifecycleOwner
         observeDetail()
@@ -46,7 +46,7 @@ class DetailFragment : Fragment() {
              changedFavorite(isFavorite)
          }*/
         val tabList = arrayOf(resources.getString(R.string.followers), resources.getString(R.string.following))
-        pagerAdapter = PagerAdapter(tabList, args.Username, this)
+        pagerAdapter = PagerAdapter(tabList, args.username, this)
         detailBinding.pager.adapter = pagerAdapter
 
         TabLayoutMediator(detailBinding.tabs, detailBinding.pager) {tab, position ->
@@ -56,15 +56,15 @@ class DetailFragment : Fragment() {
 
     private fun observeDetail() {
 
-        detailViewModel.detailUsers(args.Username).observe(viewLifecycleOwner, {
+        detailViewModel.detailUsers(args.username).observe(viewLifecycleOwner, {
             when(it) {
                 is Resource.Success -> {
                     user = it.data!!
                     detailBinding.data = it.data
-                    detailViewModel.getDetailState(args.Username)?.observe(viewLifecycleOwner, { user ->
+                    detailViewModel.getDetailState(args.username)?.observe(viewLifecycleOwner) { user ->
                         isFavorite = user.isFavorite == true
                         changedFavorite(isFavorite)
-                    })
+                    }
                     detailBinding.fabFavorite.show()
                 }
 
@@ -92,16 +92,12 @@ class DetailFragment : Fragment() {
         if (!isFavorite) {
             user.isFavorite = !isFavorite
             detailViewModel.insertFavorite(user)
-            FancyToast.makeText(
-                context, resources.getString(R.string.favorite_add, user.login), Toast.LENGTH_SHORT, FancyToast.SUCCESS, false
-            ).show()
+            Toast.makeText(context, resources.getString(R.string.favorite_add, user.login), Toast.LENGTH_SHORT).show()
             isFavorite = !isFavorite
         } else {
             user.isFavorite = !isFavorite
             detailViewModel.deleteFavorite(user)
-            FancyToast.makeText(
-                context, resources.getString(R.string.favorite_remove, user.login), Toast.LENGTH_SHORT, FancyToast.ERROR, false
-            ).show()
+            Toast.makeText(context, resources.getString(R.string.favorite_remove, user.login), Toast.LENGTH_SHORT).show()
             isFavorite = !isFavorite
         }
     }

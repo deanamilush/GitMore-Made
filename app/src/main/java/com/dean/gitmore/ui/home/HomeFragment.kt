@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.dean.core.data.Resource
 import com.dean.core.ui.UserAdapter
 import com.dean.gitmore.R
-import com.dean.gitmore.databinding.FragmentFavoriteBinding
+import com.dean.gitmore.databinding.FavoriteFragmentBinding
 import com.dean.gitmore.databinding.FragmentFollowBinding
 import com.dean.gitmore.databinding.FragmentHomeBinding
 import com.dean.gitmore.util.ShowState
@@ -98,7 +98,7 @@ class HomeFragment : Fragment(), ShowState {
     override fun onSuccessState(
         homeFragmentBinding: FragmentHomeBinding?,
         followFragmentBinding: FragmentFollowBinding?,
-        favoriteFragmentBinding: FragmentFavoriteBinding?,
+        favoriteFragmentBinding: FavoriteFragmentBinding?,
     ) {
         homeFragmentBinding?.apply {
             errLayout.mainNotFound.visibility = View.GONE
@@ -111,7 +111,7 @@ class HomeFragment : Fragment(), ShowState {
     override fun onLoadingState(
         homeFragmentBinding: FragmentHomeBinding?,
         followFragmentBinding: FragmentFollowBinding?,
-        favoriteFragmentBinding: FragmentFavoriteBinding?,
+        favoriteFragmentBinding: FavoriteFragmentBinding?,
     ) {
         homeFragmentBinding?.apply {
             errLayout.mainNotFound.visibility = View.GONE
@@ -123,7 +123,7 @@ class HomeFragment : Fragment(), ShowState {
     override fun onErrorState(
         homeFragmentBinding: FragmentHomeBinding?,
         followFragmentBinding: FragmentFollowBinding?,
-        favoriteFragmentBinding: FragmentFavoriteBinding?,
+        favoriteFragmentBinding: FavoriteFragmentBinding?,
         message: String?
     ) {
         homeFragmentBinding?.apply {

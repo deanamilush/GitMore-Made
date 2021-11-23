@@ -43,10 +43,13 @@ buildscript {
         //Custom UI
         fancy_toast_version = "0.1.8"
         victor_rotate_loading_version = "1.0.4"
+
+
     }
     repositories {
         google()
         mavenCentral()
+
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$koin_version"

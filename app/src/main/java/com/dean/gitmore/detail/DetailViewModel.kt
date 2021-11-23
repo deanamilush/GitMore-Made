@@ -1,7 +1,6 @@
 package com.dean.gitmore.detail
 
 import androidx.lifecycle.*
-import com.dean.core.domain.User
 import com.dean.core.domain.UserUseCase
 import kotlinx.coroutines.launch
 

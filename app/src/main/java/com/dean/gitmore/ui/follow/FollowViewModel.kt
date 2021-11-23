@@ -2,7 +2,6 @@ package com.dean.gitmore.ui.follow
 
 import androidx.lifecycle.*
 import com.dean.core.data.Resource
-import com.dean.core.domain.User
 import com.dean.core.domain.UserUseCase
 import com.dean.gitmore.util.TypeView
 
